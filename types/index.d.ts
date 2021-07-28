@@ -66,6 +66,8 @@ declare namespace plv8 {
   const NOTICE = 18;
   const WARNING = 19;
   const ERROR = 20;
+  const version: string;
+  const v8version: string;
   const plv8: Plv8Version;
 
   function elog();
