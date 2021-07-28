@@ -54,7 +54,7 @@ FROM postgres:13
 ENV PLV8_VERSION=3.0.0
 
 RUN apt-get update
-RUN apt-get install llvm
+RUN apt-get install -y llvm libc++-dev
 COPY --from=builder build/plv8-${PLV8_VERSION}/ /build
 
 RUN env
@@ -62,23 +62,21 @@ RUN env
 WORKDIR /build
 
 
-RUN /bin/mkdir -p '/usr/lib/postgresql/13/lib' && \
-/bin/mkdir -p '/usr/share/postgresql/13/extension' && \
-/bin/mkdir -p '/usr/share/postgresql/13/extension' && \
-/usr/bin/install -c -m 755  plv8-3.0.0.so '/usr/lib/postgresql/13/lib/plv8-3.0.0.so' && \
-/usr/bin/install -c -m 644 .//plv8.control '/usr/share/postgresql/13/extension/' && \
-/usr/bin/install -c -m 644 .//plv8.control .//plv8--3.0.0.sql .//upgrade/plv8--1.5.1--3.0.0.sql .//upgrade/plv8--2.3.7--3.0.0.sql .//upgrade/plv8--1.5.2--3.0.0.sql .//upgrade/plv8--2.3.5--3.0.0.sql .//upgrade/plv8--2.3.2--3.0.0.sql .//upgrade/plv8--1.5.5--3.0.0.sql .//upgrade/plv8--2.3.0--3.0.0.sql .//upgrade/plv8--2.0.3--3.0.0.sql .//upgrade/plv8--1.5.0--3.0.0.sql .//upgrade/plv8--2.3.8--3.0.0.sql .//upgrade/plv8--2.1.0--3.0.0.sql .//upgrade/plv8--2.3.10--3.0.0.sql .//upgrade/plv8--2.0.1--3.0.0.sql .//upgrade/plv8--2.3.6--3.0.0.sql .//upgrade/plv8--1.5.7--3.0.0.sql .//upgrade/plv8--2.1.2--3.0.0.sql .//upgrade/plv8--1.5.6--3.0.0.sql .//upgrade/plv8--2.3.3--3.0.0.sql .//upgrade/plv8--2.3.9--3.0.0.sql .//upgrade/plv8--2.0.0--3.0.0.sql .//upgrade/plv8--1.5.3--3.0.0.sql .//upgrade/plv8--2.3.4--3.0.0.sql .//upgrade/plv8--2.3.1--3.0.0.sql .//upgrade/plv8--1.5.4--3.0.0.sql .//plcoffee.control .//plcoffee--3.0.0.sql .//plls.control .//plls--3.0.0.sql  '/usr/share/postgresql/13/extension/' && \
-/bin/mkdir -p '/usr/lib/postgresql/13/lib/bitcode/plv8-3.0.0' && \
-/bin/mkdir -p '/usr/lib/postgresql/13/lib/bitcode'/plv8-3.0.0/ && \
-/usr/bin/install -c -m 644 plv8.bc '/usr/lib/postgresql/13/lib/bitcode'/plv8-3.0.0/./ && \
-/usr/bin/install -c -m 644 plv8_type.bc '/usr/lib/postgresql/13/lib/bitcode'/plv8-3.0.0/./ && \
-/usr/bin/install -c -m 644 plv8_func.bc '/usr/lib/postgresql/13/lib/bitcode'/plv8-3.0.0/./ && \
-/usr/bin/install -c -m 644 plv8_param.bc '/usr/lib/postgresql/13/lib/bitcode'/plv8-3.0.0/./ && \
-/usr/bin/install -c -m 644 plv8_allocator.bc '/usr/lib/postgresql/13/lib/bitcode'/plv8-3.0.0/./ && \
-/usr/bin/install -c -m 644 coffee-script.bc '/usr/lib/postgresql/13/lib/bitcode'/plv8-3.0.0/./ && \
-/usr/bin/install -c -m 644 livescript.bc '/usr/lib/postgresql/13/lib/bitcode'/plv8-3.0.0/./ && \
-cd '/usr/lib/postgresql/13/lib/bitcode' && \
-llvm-lto -thinlto -thinlto-action=thinlink -o plv8-3.0.0.index.bc plv8-3.0.0/plv8.bc plv8-3.0.0/plv8_type.bc plv8-3.0.0/plv8_func.bc plv8-3.0.0/plv8_param.bc plv8-3.0.0/plv8_allocator.bc plv8-3.0.0/coffee-script.bc plv8-3.0.0/livescript.bc
+RUN mkdir -p "/usr/lib/postgresql/${PG_MAJOR}/lib" && \
+mkdir -p "/usr/share/postgresql/${PG_MAJOR}/extension" && \
+/usr/bin/install -c -m 755  plv8-${PLV8_VERSION}.so "/usr/lib/postgresql/${PG_MAJOR}/lib/plv8-${PLV8_VERSION}.so" && \
+/usr/bin/install -c -m 644 .//plv8.control "/usr/share/postgresql/${PG_MAJOR}/extension/" && \
+/usr/bin/install -c -m 644 .//plv8.control .//plv8--${PLV8_VERSION}.sql .//upgrade/plv8--1.5.1--${PLV8_VERSION}.sql .//upgrade/plv8--2.3.7--${PLV8_VERSION}.sql .//upgrade/plv8--1.5.2--${PLV8_VERSION}.sql .//upgrade/plv8--2.3.5--${PLV8_VERSION}.sql .//upgrade/plv8--2.3.2--${PLV8_VERSION}.sql .//upgrade/plv8--1.5.5--${PLV8_VERSION}.sql .//upgrade/plv8--2.3.0--${PLV8_VERSION}.sql .//upgrade/plv8--2.0.3--${PLV8_VERSION}.sql .//upgrade/plv8--1.5.0--${PLV8_VERSION}.sql .//upgrade/plv8--2.3.8--${PLV8_VERSION}.sql .//upgrade/plv8--2.1.0--${PLV8_VERSION}.sql .//upgrade/plv8--2.3.10--${PLV8_VERSION}.sql .//upgrade/plv8--2.0.1--${PLV8_VERSION}.sql .//upgrade/plv8--2.3.6--${PLV8_VERSION}.sql .//upgrade/plv8--1.5.7--${PLV8_VERSION}.sql .//upgrade/plv8--2.1.2--${PLV8_VERSION}.sql .//upgrade/plv8--1.5.6--${PLV8_VERSION}.sql .//upgrade/plv8--2.3.3--${PLV8_VERSION}.sql .//upgrade/plv8--2.3.9--${PLV8_VERSION}.sql .//upgrade/plv8--2.0.0--${PLV8_VERSION}.sql .//upgrade/plv8--1.5.3--${PLV8_VERSION}.sql .//upgrade/plv8--2.3.4--${PLV8_VERSION}.sql .//upgrade/plv8--2.3.1--${PLV8_VERSION}.sql .//upgrade/plv8--1.5.4--${PLV8_VERSION}.sql .//plcoffee.control .//plcoffee--${PLV8_VERSION}.sql .//plls.control .//plls--${PLV8_VERSION}.sql  "/usr/share/postgresql/${PG_MAJOR}/extension/" && \
+mkdir -p "/usr/lib/postgresql/${PG_MAJOR}/lib/bitcode/plv8-${PLV8_VERSION}" && \
+/usr/bin/install -c -m 644 plv8.bc "/usr/lib/postgresql/${PG_MAJOR}/lib/bitcode"/plv8-${PLV8_VERSION}/./ && \
+/usr/bin/install -c -m 644 plv8_type.bc "/usr/lib/postgresql/${PG_MAJOR}/lib/bitcode"/plv8-${PLV8_VERSION}/./ && \
+/usr/bin/install -c -m 644 plv8_func.bc "/usr/lib/postgresql/${PG_MAJOR}/lib/bitcode"/plv8-${PLV8_VERSION}/./ && \
+/usr/bin/install -c -m 644 plv8_param.bc "/usr/lib/postgresql/${PG_MAJOR}/lib/bitcode"/plv8-${PLV8_VERSION}/./ && \
+/usr/bin/install -c -m 644 plv8_allocator.bc "/usr/lib/postgresql/${PG_MAJOR}/lib/bitcode"/plv8-${PLV8_VERSION}/./ && \
+/usr/bin/install -c -m 644 coffee-script.bc "/usr/lib/postgresql/${PG_MAJOR}/lib/bitcode"/plv8-${PLV8_VERSION}/./ && \
+/usr/bin/install -c -m 644 livescript.bc "/usr/lib/postgresql/${PG_MAJOR}/lib/bitcode"/plv8-${PLV8_VERSION}/./ && \
+cd "/usr/lib/postgresql/${PG_MAJOR}/lib/bitcode" && \
+llvm-lto -thinlto -thinlto-action=thinlink -o plv8-${PLV8_VERSION}.index.bc plv8-${PLV8_VERSION}/plv8.bc plv8-${PLV8_VERSION}/plv8_type.bc plv8-${PLV8_VERSION}/plv8_func.bc plv8-${PLV8_VERSION}/plv8_param.bc plv8-${PLV8_VERSION}/plv8_allocator.bc plv8-${PLV8_VERSION}/coffee-script.bc plv8-${PLV8_VERSION}/livescript.bc
 
 
 RUN find /build -type f

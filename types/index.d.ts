@@ -7,12 +7,29 @@ declare namespace plv8 {
 
   interface MemoryUsage {
     "total_heap_size": number;
+    "total_physical_size"?: number;
     "used_heap_size": number;
+    "heap_size_limit"?: number;
     "external_memory": number;
+    number_of_native_contexts?: number;
   }
 
   interface Cursor {
 
+  }
+
+  interface SqlError extends Error {
+    sqlerrcode: string;
+    schema_name: string | null;
+    table_name: string | null;
+    column_name: string | null;
+    datatype_name: string | null;
+    constraint_name: string | null;
+    detail: string | null;
+    hint: string | null;
+    context: string | null;
+    internalquery: string | null;
+    code: number; // Uint32
   }
 
   interface WindowObject<T = unknown> {
@@ -24,6 +41,12 @@ declare namespace plv8 {
     get_func_arg_in_current(argno: unknown, relpos: unknown, seektype: unknown, mark_pos: unknown): unknown;
     get_partition_local(size?: number): undefined | T;
     set_partition_local(v: T): unknown;
+    get_partition_row_count(): unknown;
+    get_func_arg_current(): unknown;
+    set_mark_position(): unknown;
+    SEEK_CURRENT: number;
+    SEEK_HEAD: number;
+    SEEK_TAIL: number;
   }
 
   interface PreparedPlan {
@@ -53,7 +76,7 @@ declare namespace plv8 {
 
   function return_next();
 
-  function subtransaction();
+  function subtransaction<T>(fn: () => T): T;
 
   function find_function(): Function;
 
@@ -69,8 +92,8 @@ declare namespace plv8 {
 
   function memory_usage(): MemoryUsage;
 
-  function rollback();
+  function rollback(): void;
 
-  function commit();
+  function commit(): void;
 }
 
