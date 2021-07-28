@@ -15,6 +15,17 @@ declare namespace plv8 {
 
   }
 
+  interface WindowObject<T = unknown> {
+    get_current_position(): number;
+    get_partition_row_count(): number;
+    rows_are_peers(pos1: unknown, pos2: unknown): boolean;
+    get_func_arg_in_partition(argno: unknown, relpos: unknown, seektype: unknown, mark_pos: unknown): unknown;
+    get_func_arg_in_frame(argno: unknown, relpos: unknown, seektype: unknown, mark_pos: unknown): unknown;
+    get_func_arg_in_current(argno: unknown, relpos: unknown, seektype: unknown, mark_pos: unknown): unknown;
+    get_partition_local(size?: number): undefined | T;
+    set_partition_local(v: T): unknown;
+  }
+
   interface PreparedPlan {
     execute(args?: any[]);
     cursor(args?: any[]): Cursor;
@@ -38,7 +49,7 @@ declare namespace plv8 {
 
   function execute(sql: string, args?: any[]) : any[] | number;
 
-  function prepare(query: string, typeNames?: string[]);
+  function prepare(query: string, typeNames?: string[]): PreparedPlan;
 
   function return_next();
 
@@ -46,7 +57,7 @@ declare namespace plv8 {
 
   function find_function(): Function;
 
-  function get_window_object();
+  function get_window_object<T>(): WindowObject<T>;
 
   function quote_literal(literal: string): string;
 
@@ -56,7 +67,7 @@ declare namespace plv8 {
 
   function quote_ident(ident: string): string;
 
-  function memory_usage();
+  function memory_usage(): MemoryUsage;
 
   function rollback();
 

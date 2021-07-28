@@ -53,9 +53,14 @@ RUN find .
 FROM postgres:13
 ENV PLV8_VERSION=3.0.0
 
+RUN apt-get update
+RUN apt-get install llvm
 COPY --from=builder build/plv8-${PLV8_VERSION}/ /build
 
+RUN env
+
 WORKDIR /build
+
 
 RUN /bin/mkdir -p '/usr/lib/postgresql/13/lib' && \
 /bin/mkdir -p '/usr/share/postgresql/13/extension' && \
@@ -73,7 +78,7 @@ RUN /bin/mkdir -p '/usr/lib/postgresql/13/lib' && \
 /usr/bin/install -c -m 644 coffee-script.bc '/usr/lib/postgresql/13/lib/bitcode'/plv8-3.0.0/./ && \
 /usr/bin/install -c -m 644 livescript.bc '/usr/lib/postgresql/13/lib/bitcode'/plv8-3.0.0/./ && \
 cd '/usr/lib/postgresql/13/lib/bitcode' && \
-/usr/lib/llvm-10/bin/llvm-lto -thinlto -thinlto-action=thinlink -o plv8-3.0.0.index.bc plv8-3.0.0/plv8.bc plv8-3.0.0/plv8_type.bc plv8-3.0.0/plv8_func.bc plv8-3.0.0/plv8_param.bc plv8-3.0.0/plv8_allocator.bc plv8-3.0.0/coffee-script.bc plv8-3.0.0/livescript.bc
+llvm-lto -thinlto -thinlto-action=thinlink -o plv8-3.0.0.index.bc plv8-3.0.0/plv8.bc plv8-3.0.0/plv8_type.bc plv8-3.0.0/plv8_func.bc plv8-3.0.0/plv8_param.bc plv8-3.0.0/plv8_allocator.bc plv8-3.0.0/coffee-script.bc plv8-3.0.0/livescript.bc
 
 
 RUN find /build -type f
